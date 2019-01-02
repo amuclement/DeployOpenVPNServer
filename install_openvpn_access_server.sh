@@ -15,6 +15,8 @@ sudo echo "openvpn:$userPassword"|sudo chpasswd
 PUBLICIP=$(curl -s ifconfig.me)
 sudo apt-get install sqlite3
 sudo sqlite3 "/usr/local/openvpn_as/etc/db/config.db" "update config set value='$PUBLICIP' where name='host.name';"
-
+cd /usr/local/openvpn_as/scripts/
+sudo ./sacli --key "auth.module.type" --value "pam" ConfigPut
+sudo ./sacli start
 #restart OpenVPN AS service
 sudo systemctl restart openvpnas
