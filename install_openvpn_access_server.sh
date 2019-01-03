@@ -15,8 +15,17 @@ sudo echo "openvpn:$userPassword"|sudo chpasswd
 PUBLICIP=$(curl -s ifconfig.me)
 sudo apt-get install sqlite3
 sudo sqlite3 "/usr/local/openvpn_as/etc/db/config.db" "update config set value='$PUBLICIP' where name='host.name';"
+
+#configure PAM authentication
 cd /usr/local/openvpn_as/scripts/
 sudo ./sacli --key "auth.module.type" --value "pam" ConfigPut
 sudo ./sacli start
+
+#configure the server to listen only to TCP port:
+./sacli --key "vpn.server.daemon.enable" --value "false" ConfigPut
+./sacli --key "vpn.daemon.0.listen.protocol" --value "tcp" ConfigPut
+./sacli --key "vpn.server.port_share.enable" --value "true" ConfigPut
+./sacli start
+
 #restart OpenVPN AS service
 sudo systemctl restart openvpnas
